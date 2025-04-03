@@ -4,11 +4,10 @@ include ('./conn/conn.php');
 include ('./partials/modal.php');
 ?>
 
-<div class="main">
+<div class="main bg-gray-100 min-h-screen">
 
-<nav class="bg-blue-600 shadow-lg">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center py-3">
+    <nav class="bg-blue-600 shadow-lg py-3">
+        <div class="container mx-auto px-4 flex justify-between items-center">
             <!-- Logo -->
             <a href="#" class="text-white text-2xl font-bold flex items-center">
                 📚 QUESTIONAIRRE
@@ -16,110 +15,106 @@ include ('./partials/modal.php');
 
             <!-- Mobile Menu Button -->
             <button class="lg:hidden text-white focus:outline-none" id="menu-btn">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" 
-                     viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
 
-            <!-- Logout Button (Aligned to the Right) -->
-            <div class="ml-auto hidden lg:block">
+            <!-- Logout Button -->
+            <div class="hidden lg:block">
                 <a href="./index.php" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
                     🚪 Log out
                 </a>
             </div>
         </div>
-    </div>
-</nav>
-
-
+    </nav>
 
     <!-- Quiz Management -->
-    <div class="container mt-4">
+    <div class="container mx-auto mt-6 px-4">
         <nav>
-            <div class="nav nav-pills nav-fill" id="nav-tab" role="tablist">
-                <button class="nav-link active" id="nav-home-tab" data-toggle="tab" data-target="#nav-home" type="button" role="tab">📝 Questions</button>
-                <button class="nav-link" id="nav-profile-tab" data-toggle="tab" data-target="#nav-profile" type="button" role="tab">📊 Results</button>
+            <div class="flex space-x-4">
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-lg focus:outline-none" id="nav-home-tab" data-toggle="tab" data-target="#nav-home">📝 Questions</button>
+                <button class="bg-gray-500 text-white px-4 py-2 rounded-lg focus:outline-none" id="nav-profile-tab" data-toggle="tab" data-target="#nav-profile">📊 Results</button>
             </div>
         </nav>
 
-        <div class="tab-content mt-4" id="nav-tabContent">
+        <div class="mt-6 bg-white p-6 rounded-lg shadow-lg">
             <!-- Questions Tab -->
-            <div class="tab-pane fade show active p-4" id="nav-home" role="tabpanel">
-                <div class="d-flex justify-content-between mb-3">
-                    <h4>📋 Manage Questions</h4>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addQuestionModal">
-                        ➕ Add Question
-                    </button>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-home">
+                    <div class="flex justify-between mb-4">
+                        <h4 class="text-xl font-bold">📋 Manage Questions</h4>
+                        <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" data-toggle="modal" data-target="#addQuestionModal">➕ Add Question</button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="table-auto w-full border-collapse border border-gray-300">
+                            <thead class="bg-gray-800 text-white">
+                                <tr>
+                                    <th class="px-4 py-2">📌 Quiz ID</th>
+                                    <th class="px-4 py-2">❓ Question</th>
+                                    <th class="px-4 py-2">✅ Correct Answer</th>
+                                    <th class="px-4 py-2">⚙️ Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white">
+                                <?php 
+                                $stmt = $conn->prepare('SELECT * FROM `tbl_quiz`');
+                                $stmt->execute();
+                                $result = $stmt->fetchAll();
+                                
+                                foreach ($result as $row) { ?>
+                                    <tr class="border-b border-gray-300">
+                                        <td class="px-4 py-2 text-center"> <?= $row['tbl_quiz_id'] ?> </td>
+                                        <td class="px-4 py-2"> <?= $row['quiz_question'] ?> </td>
+                                        <td class="px-4 py-2 text-center"> <?= strtoupper($row['correct_answer']) ?> </td>
+                                        <td class="px-4 py-2 text-center">
+                                            <button class="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600" onclick="updateQuestion(<?= $row['tbl_quiz_id'] ?>)">✏️ Edit</button>
+                                            <button class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600" onclick="deleteQuestion(<?= $row['tbl_quiz_id'] ?>)">🗑️ Delete</button>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th scope="col">📌 Quiz ID</th>
-                                <th scope="col">❓ Question</th>
-                                <th scope="col">✅ Correct Answer</th>
-                                <th scope="col">⚙️ Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                            $stmt = $conn->prepare('SELECT * FROM `tbl_quiz`');
-                            $stmt->execute();
-                            $result = $stmt->fetchAll();
-
-                            foreach ($result as $row) { ?>
+                <!-- Results Tab -->
+                <div class="tab-pane fade" id="nav-profile">
+                    <h4 class="text-xl font-bold mb-4">📊 Student Results</h4>
+                    <div class="overflow-x-auto">
+                        <table class="table-auto w-full border-collapse border border-gray-300">
+                            <thead class="bg-gray-800 text-white">
                                 <tr>
-                                    <td><?= $row['tbl_quiz_id'] ?></td>
-                                    <td><?= $row['quiz_question'] ?></td>
-                                    <td><?= strtoupper($row['correct_answer']) ?></td>
-                                    <td>
-                                        <button type="button" class="btn btn-warning btn-sm" onclick="updateQuestion(<?= $row['tbl_quiz_id'] ?>)">✏️ Edit</button>
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteQuestion(<?= $row['tbl_quiz_id'] ?>)">🗑️ Delete</button>
-                                    </td>
+                                    <th class="px-4 py-2">🏅 Result ID</th>
+                                    <th class="px-4 py-2">🎓 Student Name</th>
+                                    <th class="px-4 py-2">📌 Year & Section</th>
+                                    <th class="px-4 py-2">📊 Score</th>
+                                    <th class="px-4 py-2">📅 Date Taken</th>
+                                    <th class="px-4 py-2">⚙️ Action</th>
                                 </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Results Tab -->
-            <div class="tab-pane fade p-4" id="nav-profile" role="tabpanel">
-                <h4>📊 Student Results</h4>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th scope="col">🏅 Result ID</th>
-                                <th scope="col">🎓 Student Name</th>
-                                <th scope="col">📌 Year & Section</th>
-                                <th scope="col">📊 Score</th>
-                                <th scope="col">📅 Date Taken</th>
-                                <th scope="col">⚙️ Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                            $stmt = $conn->prepare('SELECT * FROM `tbl_result`');
-                            $stmt->execute();
-                            $result = $stmt->fetchAll();
-
-                            foreach ($result as $row) { ?>
-                                <tr>
-                                    <td><?= $row['tbl_result_id'] ?></td>
-                                    <td><?= $row['quiz_taker'] ?></td>
-                                    <td><?= $row['year_section'] ?></td>
-                                    <td><?= $row['total_score'] ?></td>
-                                    <td><?= $row['date_taken'] ?></td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteResult(<?= $row['tbl_result_id'] ?>)">🗑️ Delete</button>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="bg-white">
+                                <?php 
+                                $stmt = $conn->prepare('SELECT * FROM `tbl_result`');
+                                $stmt->execute();
+                                $result = $stmt->fetchAll();
+                                
+                                foreach ($result as $row) { ?>
+                                    <tr class="border-b border-gray-300">
+                                        <td class="px-4 py-2 text-center"> <?= $row['tbl_result_id'] ?> </td>
+                                        <td class="px-4 py-2"> <?= $row['quiz_taker'] ?> </td>
+                                        <td class="px-4 py-2 text-center"> <?= $row['year_section'] ?> </td>
+                                        <td class="px-4 py-2 text-center"> <?= $row['total_score'] ?> </td>
+                                        <td class="px-4 py-2 text-center"> <?= $row['date_taken'] ?> </td>
+                                        <td class="px-4 py-2 text-center">
+                                            <button class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600" onclick="deleteResult(<?= $row['tbl_result_id'] ?>)">🗑️ Delete</button>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -127,4 +122,3 @@ include ('./partials/modal.php');
 </div>
 
 <?php include ('./partials/footer.php'); ?>
-
