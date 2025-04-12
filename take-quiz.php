@@ -5,33 +5,6 @@ include ('./partials/modal.php');
 ?>
 
 <div class="main">
-    <!-- Navbar -->
-   
-<nav class="bg-blue-600 shadow-lg">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center py-3">
-            <!-- Logo -->
-            <a href="#" class="text-white text-2xl font-bold flex items-center">
-                📚 QUESTIONAIRRE
-            </a>
-
-            <!-- Mobile Menu Button -->
-            <button class="lg:hidden text-white focus:outline-none" id="menu-btn">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" 
-                     viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
-
-            <!-- Logout Button (Aligned to the Right) -->
-            <div class="ml-auto hidden lg:block">
-                <a href="./index.php" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
-                    🚪 Log out
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
 
     <!-- Quiz Section -->
     <div class="container mt-4 text-dark">
